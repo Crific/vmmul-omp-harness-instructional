@@ -25,20 +25,22 @@ void my_dgemv(int n, double* A, double* x, double* y) {
    // insert your dgemv code here. you may need to create additional parallel regions,
    // and you will want to comment out the above parallel code block that prints out
    // nthreads and thread_id so as to not taint your timings
+
+    // Use OpenMP to parallelize the outer loop
     #pragma omp parallel for
     for (int i = 0; i < n; i++) {
-        double sum = 0.0; 
-        double* rowA = A + i * n; // Pointer to the start of the i-th row in A
+        double sum = 0.0;
 
-        // This loop could be auto-vectorized by the compiler
+        // Compute the sum of A's row elements multiplied by vector x's elements
         for (int j = 0; j < n; j++) {
-            sum = sum + rowA[j] * x[j]; 
+            sum += A[i * n + j] * x[j]; // Accessing A[i, j] in row-major order
         }
 
-        // Critical section ensures that each update to y[i] is atomic
-        #pragma omp critical
-        y[i] = y[i] + sum; 
+        // Update y[i] with the calculated sum
+        // Critical section is necessary if multiple threads might write to the same y[i] at once
+        // In this case, each thread writes to a different y[i], so it's inherently thread-safe
+        #pragma omp atomic
+        y[i] += sum;
     }
 }
-
  
