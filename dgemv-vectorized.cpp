@@ -1,12 +1,30 @@
+/* 
+ * CP#3 Vectorization Requirements
+ *
+ * Basic idea:
+ * - Write a solid dgemv-basic.cpp code.
+ * - Transplant that code into dgemv-vectorized.cpp.
+ * - Let the compiler vectorize the code.
+ *
+ * Do not:
+ * - Loop unroll your code.
+ * - Use any OpenMP pragmas (they won't work at all here).
+ *
+ * Issues to consider:
+ * - Did your code vectorize?
+ * - How can you tell?
+ * - How do you fix it if it did not vectorize?
+ *
+ */
 const char* dgemv_desc = "Vectorized implementation of matrix-vector multiply.";
 
-/*
- * This routine performs a dgemv operation
- * Y :=  A * X + Y
- * where A is n-by-n matrix stored in row-major format, and X and Y are n by 1 vectors.
- * On exit, A and X maintain their input values.
- */
 void my_dgemv(int n, double* A, double* x, double* y) {
-   // insert your code here: implementation of vectorized vector-matrix multiply
-
+    for (int i = 0; i < n; i++) {
+        double sum = 0.0;
+        for (int j = 0; j < n; j++) {
+            sum += A[i * n + j] * x[j];
+        }
+        y[i] += sum;
+    }
 }
+
