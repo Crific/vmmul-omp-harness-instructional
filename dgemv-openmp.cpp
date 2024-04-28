@@ -36,9 +36,6 @@ void my_dgemv(int n, double* A, double* x, double* y) {
             sum += A[i * n + j] * x[j]; // Accessing A[i, j] in row-major order
         }
 
-        // Update y[i] with the calculated sum
-        // Critical section is necessary if multiple threads might write to the same y[i] at once
-        // In this case, each thread writes to a different y[i], so it's inherently thread-safe
         #pragma omp atomic
         y[i] += sum;
     }
