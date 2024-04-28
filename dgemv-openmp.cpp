@@ -27,15 +27,17 @@ void my_dgemv(int n, double* A, double* x, double* y) {
    // nthreads and thread_id so as to not taint your timings
     #pragma omp parallel for
     for (int i = 0; i < n; i++) {
-        double sum = 0.0;
+        double sum = 0.0; 
+        double* rowA = A + i * n; // Pointer to the start of the i-th row in A
 
-        // Compute the sum of A's row elements multiplied by vector x's elements
+        // This loop could be auto-vectorized by the compiler
         for (int j = 0; j < n; j++) {
-            sum += A[i * n + j] * x[j]; // Accessing A[i, j] in row-major order
+            sum = sum + rowA[j] * x[j]; 
         }
 
-        #pragma omp atomic
-        y[i] += sum;
+        // Critical section ensures that each update to y[i] is atomic
+        #pragma omp critical
+        y[i] = y[i] + sum; 
     }
 }
 

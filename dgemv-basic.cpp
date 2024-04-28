@@ -8,18 +8,14 @@ const char* dgemv_desc = "Basic implementation of matrix-vector multiply.";
  */
 
 void my_dgemv(int n, double* A, double* x, double* y) {
-    // row i in matrix A
     for (int i = 0; i < n; i++) {
+        double sum = 0.0; 
+        double* rowA = A + i * n; // Pointer to the start of the i-th row in A
 
-        // Initial sum for the row
-        double sum = 0.0;
         
-        // Compute the sum of A's row elements multiplied by vector x's elements
         for (int j = 0; j < n; j++) {
-            // Summation of A[i, j] * x[j]
-            sum += A[i * n + j] * x[j]; // Accessing A[i, j] in row-major order
+            sum = sum + rowA[j] * x[j]; 
         }
-        // Update y[i] with the calculated sum
-        y[i] += sum;
-    }
+
+        y[i] = y[i] + sum; 
 }
